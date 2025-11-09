@@ -1,40 +1,68 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { useDataStore } from '../store/useDataStore';
-import { Settings as SettingsIcon, DollarSign, Award, Package } from 'lucide-react';
-import { Button } from './ui/button';
-import { useState } from 'react';
-import { toast } from 'sonner@2.0.3';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { useDataStore } from "../store/useDataStore";
+import {
+  Settings as SettingsIcon,
+  DollarSign,
+  Award,
+  Package,
+} from "lucide-react";
+import { Button } from "./ui/button";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 export function Settings() {
-  const { 
-    shuttlecockPrice, 
-    courtPriceNonMember, 
+  const {
+    shuttlecockPrice,
+    courtPriceNonMember,
     membershipFeeMonthly,
-    setShuttlecockPrice,
-    setCourtPriceNonMember,
-    setMembershipFeeMonthly
+    updateSettings,
+    fetchSettings,
+    isAuthenticated,
   } = useDataStore();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchSettings();
+    }
+  }, [fetchSettings, isAuthenticated]);
 
   const [tempSettings, setTempSettings] = useState({
     shuttlecockPrice,
     courtPriceNonMember,
-    membershipFeeMonthly
+    membershipFeeMonthly,
   });
 
-  const handleSave = () => {
-    setShuttlecockPrice(tempSettings.shuttlecockPrice);
-    setCourtPriceNonMember(tempSettings.courtPriceNonMember);
-    setMembershipFeeMonthly(tempSettings.membershipFeeMonthly);
-    toast.success('Pengaturan berhasil disimpan!');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSave = async () => {
+    setIsLoading(true);
+    try {
+      await updateSettings({
+        shuttlecock_price: tempSettings.shuttlecockPrice,
+        court_price_non_member: tempSettings.courtPriceNonMember,
+        membership_fee_monthly: tempSettings.membershipFeeMonthly,
+      });
+      toast.success("Pengaturan berhasil disimpan!");
+    } catch (error) {
+      toast.error("Gagal menyimpan pengaturan");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleReset = () => {
     setTempSettings({
       shuttlecockPrice,
       courtPriceNonMember,
-      membershipFeeMonthly
+      membershipFeeMonthly,
     });
   };
 
@@ -47,7 +75,8 @@ export function Settings() {
             Pengaturan Harga
           </CardTitle>
           <CardDescription>
-            Atur harga shuttlecock, lapangan non-member, dan iuran member bulanan
+            Atur harga shuttlecock, lapangan non-member, dan iuran member
+            bulanan
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
@@ -73,14 +102,19 @@ export function Settings() {
                     type="number"
                     min="0"
                     value={tempSettings.shuttlecockPrice}
-                    onChange={(e) => setTempSettings({
-                      ...tempSettings,
-                      shuttlecockPrice: parseInt(e.target.value) || 0
-                    })}
+                    onChange={(e) =>
+                      setTempSettings({
+                        ...tempSettings,
+                        shuttlecockPrice: parseInt(e.target.value) || 0,
+                      })
+                    }
                     className="text-lg border-emerald-300 focus:border-emerald-500"
                   />
                   <p className="text-sm text-gray-600 mt-2">
-                    Harga saat ini: <span className="text-emerald-600">Rp {shuttlecockPrice.toLocaleString('id-ID')}</span>
+                    Harga saat ini:{" "}
+                    <span className="text-emerald-600">
+                      Rp {shuttlecockPrice.toLocaleString("id-ID")}
+                    </span>
                   </p>
                 </div>
               </CardContent>
@@ -107,14 +141,19 @@ export function Settings() {
                     type="number"
                     min="0"
                     value={tempSettings.courtPriceNonMember}
-                    onChange={(e) => setTempSettings({
-                      ...tempSettings,
-                      courtPriceNonMember: parseInt(e.target.value) || 0
-                    })}
+                    onChange={(e) =>
+                      setTempSettings({
+                        ...tempSettings,
+                        courtPriceNonMember: parseInt(e.target.value) || 0,
+                      })
+                    }
                     className="text-lg border-orange-300 focus:border-orange-500"
                   />
                   <p className="text-sm text-gray-600 mt-2">
-                    Harga saat ini: <span className="text-orange-600">Rp {courtPriceNonMember.toLocaleString('id-ID')}</span>
+                    Harga saat ini:{" "}
+                    <span className="text-orange-600">
+                      Rp {courtPriceNonMember.toLocaleString("id-ID")}
+                    </span>
                   </p>
                 </div>
               </CardContent>
@@ -141,14 +180,19 @@ export function Settings() {
                     type="number"
                     min="0"
                     value={tempSettings.membershipFeeMonthly}
-                    onChange={(e) => setTempSettings({
-                      ...tempSettings,
-                      membershipFeeMonthly: parseInt(e.target.value) || 0
-                    })}
+                    onChange={(e) =>
+                      setTempSettings({
+                        ...tempSettings,
+                        membershipFeeMonthly: parseInt(e.target.value) || 0,
+                      })
+                    }
                     className="text-lg border-blue-300 focus:border-blue-500"
                   />
                   <p className="text-sm text-gray-600 mt-2">
-                    Harga saat ini: <span className="text-blue-600">Rp {membershipFeeMonthly.toLocaleString('id-ID')}</span>
+                    Harga saat ini:{" "}
+                    <span className="text-blue-600">
+                      Rp {membershipFeeMonthly.toLocaleString("id-ID")}
+                    </span>
                   </p>
                 </div>
               </CardContent>
@@ -157,17 +201,15 @@ export function Settings() {
 
           {/* Action Buttons */}
           <div className="flex gap-3 mt-8 justify-end">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleReset}
-              className="border-gray-300"
-            >
+              className="border-gray-300">
               Reset
             </Button>
-            <Button 
+            <Button
               onClick={handleSave}
-              className="bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700"
-            >
+              className="bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700">
               Simpan Pengaturan
             </Button>
           </div>
@@ -184,17 +226,30 @@ export function Settings() {
             </h3>
             <div className="space-y-2 text-sm text-gray-700">
               <div className="flex items-start gap-2">
-                <div className="bg-emerald-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs mt-0.5">✓</div>
+                <div className="bg-emerald-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs mt-0.5">
+                  ✓
+                </div>
                 <div>
-                  <p className="text-emerald-700"><strong>Member:</strong></p>
-                  <p className="text-gray-600 ml-1">Total Biaya = Jumlah Kok × Harga Kok</p>
+                  <p className="text-emerald-700">
+                    <strong>Member:</strong>
+                  </p>
+                  <p className="text-gray-600 ml-1">
+                    Total Biaya = Jumlah Kok × Harga Kok
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-2">
-                <div className="bg-orange-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs mt-0.5">✗</div>
+                <div className="bg-orange-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs mt-0.5">
+                  ✗
+                </div>
                 <div>
-                  <p className="text-orange-700"><strong>Non-Member:</strong></p>
-                  <p className="text-gray-600 ml-1">Total Biaya = (Jumlah Kok × Harga Kok) + Harga Lapangan Non-Member</p>
+                  <p className="text-orange-700">
+                    <strong>Non-Member:</strong>
+                  </p>
+                  <p className="text-gray-600 ml-1">
+                    Total Biaya = (Jumlah Kok × Harga Kok) + Harga Lapangan
+                    Non-Member
+                  </p>
                 </div>
               </div>
             </div>
