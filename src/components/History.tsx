@@ -8,6 +8,7 @@ import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Calendar, Search, Filter, Activity, ArrowUpRight, ArrowDownRight, Package, Clock } from 'lucide-react';
 import { cn } from './ui/utils';
+import { TableCard } from './TableCard';
 
 type TransactionType = 'all' | 'usage' | 'income' | 'expense';
 
@@ -201,106 +202,109 @@ export function History() {
       </div>
 
       {/* Transactions Table */}
-      <Card className="shadow-xl border-none overflow-hidden bg-white/60 backdrop-blur-sm ring-1 ring-primary/10">
-        <CardHeader className="bg-gradient-to-r from-primary/5 to-secondary/5 border-b border-primary/10 pb-4">
+      <TableCard
+        header={
           <div className="flex items-center justify-between">
             <CardTitle className="text-xl text-primary font-bold">Daftar Aktivitas</CardTitle>
-            <Badge variant="outline" className="rounded-full bg-white border-primary/20 text-primary font-medium shadow-sm">
+            <Badge
+              variant="outline"
+              className="rounded-full bg-white border-primary/20 text-primary font-medium shadow-sm"
+            >
               Menampilkan {filteredTransactions.length} Aktivitas
             </Badge>
           </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader className="bg-muted/10">
+        }
+        headerClassName="bg-gradient-to-r from-primary/5 to-secondary/5 border-b border-primary/10 pb-4"
+      >
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader className="bg-muted/10">
+              <TableRow>
+                <TableHead className="w-[180px]">Waktu</TableHead>
+                <TableHead className="w-[150px]">Tipe</TableHead>
+                <TableHead>Keterangan / Pemain</TableHead>
+                <TableHead className="text-right">Jumlah</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredTransactions.length === 0 ? (
                 <TableRow>
-                  <TableHead className="w-[180px]">Waktu</TableHead>
-                  <TableHead className="w-[150px]">Tipe</TableHead>
-                  <TableHead>Keterangan / Pemain</TableHead>
-                  <TableHead className="text-right">Jumlah</TableHead>
+                  <TableCell colSpan={4} className="text-center py-24 text-muted-foreground">
+                    <div className="flex flex-col items-center justify-center animate-in fade-in duration-500">
+                      <Search className="w-16 h-16 mb-4 opacity-10" />
+                      <p className="text-lg font-medium">Tidak ada data yang sesuai filter</p>
+                      <p className="text-sm">Coba ubah kriteria pencarian atau filter Anda.</p>
+                    </div>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredTransactions.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center py-24 text-muted-foreground">
-                      <div className="flex flex-col items-center justify-center animate-in fade-in duration-500">
-                        <Search className="w-16 h-16 mb-4 opacity-10" />
-                        <p className="text-lg font-medium">Tidak ada data yang sesuai filter</p>
-                        <p className="text-sm">Coba ubah kriteria pencarian atau filter Anda.</p>
+              ) : (
+                filteredTransactions.map((transaction, index) => (
+                  <TableRow key={index} className="group hover:bg-muted/30 transition-colors">
+                    <TableCell>
+                      <div className="flex items-center gap-2 text-sm font-medium">
+                        <Calendar className="w-4 h-4 text-muted-foreground" />
+                        {new Date(transaction.date).toLocaleDateString('id-ID', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric'
+                        })}
                       </div>
                     </TableCell>
-                  </TableRow>
-                ) : (
-                  filteredTransactions.map((transaction, index) => (
-                    <TableRow key={index} className="group hover:bg-muted/30 transition-colors">
-                      <TableCell>
-                        <div className="flex items-center gap-2 text-sm font-medium">
-                          <Calendar className="w-4 h-4 text-muted-foreground" />
-                          {new Date(transaction.date).toLocaleDateString('id-ID', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric'
-                          })}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={cn(
-                          "rounded-full px-3 py-0.5 font-bold border-none shadow-sm text-[10px] uppercase tracking-wider",
-                          transaction.type === 'usage' ? "bg-indigo-50 text-indigo-600" :
-                          transaction.type === 'income' ? "bg-emerald-50 text-emerald-600" :
-                          "bg-rose-50 text-rose-600"
-                        )}>
-                          {transaction.type === 'usage' ? 'Penggunaan' : 
-                           transaction.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="max-w-[500px]">
-                          {transaction.type === 'usage' && 'players' in transaction ? (
-                            <div className="space-y-2">
-                              <div className="flex flex-wrap gap-1">
-                                {transaction.players.map((player, idx) => (
-                                  <Badge
-                                    key={idx}
-                                    className={cn(
-                                      "text-[10px] font-bold rounded-full border-none px-2 shadow-sm",
-                                      player.is_member ? "bg-emerald-50 text-emerald-600" : "bg-orange-50 text-orange-600"
-                                    )}
-                                  >
-                                    {player.name}
-                                  </Badge>
-                                ))}
-                              </div>
-                              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                                <Package className="w-3 h-3" />
-                                <span>{transaction.quantity} Shuttlecock</span>
-                              </div>
+                    <TableCell>
+                      <Badge className={cn(
+                        "rounded-full px-3 py-0.5 font-bold border-none shadow-sm text-[10px] uppercase tracking-wider",
+                        transaction.type === 'usage' ? "bg-indigo-50 text-indigo-600" :
+                        transaction.type === 'income' ? "bg-emerald-50 text-emerald-600" :
+                        "bg-rose-50 text-rose-600"
+                      )}>
+                        {transaction.type === 'usage' ? 'Penggunaan' :
+                         transaction.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="max-w-[500px]">
+                        {transaction.type === 'usage' && 'players' in transaction ? (
+                          <div className="space-y-2">
+                            <div className="flex flex-wrap gap-1">
+                              {transaction.players.map((player, idx) => (
+                                <Badge
+                                  key={idx}
+                                  className={cn(
+                                    "text-[10px] font-bold rounded-full border-none px-2 shadow-sm",
+                                    player.is_member ? "bg-emerald-50 text-emerald-600" : "bg-orange-50 text-orange-600"
+                                  )}
+                                >
+                                  {player.name}
+                                </Badge>
+                              ))}
                             </div>
-                          ) : (
-                            <p className="font-medium group-hover:text-primary transition-colors">
-                              {'description' in transaction ? transaction.description : ''}
-                            </p>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <span className={cn(
-                          "text-sm font-black",
-                          transaction.type === 'income' ? 'text-emerald-600' : 'text-rose-600'
-                        )}>
-                          {transaction.type === 'income' ? '+' : '-'} Rp {transaction.amount.toLocaleString('id-ID')}
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                              <Package className="w-3 h-3" />
+                              <span>{transaction.quantity} Shuttlecock</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="font-medium group-hover:text-primary transition-colors">
+                            {'description' in transaction ? transaction.description : ''}
+                          </p>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <span className={cn(
+                        "text-sm font-black",
+                        transaction.type === 'income' ? 'text-emerald-600' : 'text-rose-600'
+                      )}>
+                        {transaction.type === 'income' ? '+' : '-'} Rp {transaction.amount.toLocaleString('id-ID')}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </TableCard>
     </div>
   );
 }

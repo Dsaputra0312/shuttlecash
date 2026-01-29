@@ -24,17 +24,14 @@ export function useAuth() {
     return { success: true };
   });
 
-  const loginCallback = useCallback((username: string, password: string) => {
-    loginApi.execute(username, password);
-  }, []);
+  const loginCallback = useCallback(
+    (username: string, password: string) => loginApi.execute(username, password),
+    [loginApi.execute]
+  );
 
-  const logoutCallback = useCallback(() => {
-    logoutApi.execute();
-  }, []);
+  const logoutCallback = useCallback(() => logoutApi.execute(), [logoutApi.execute]);
 
-  const checkAuthCallback = useCallback(() => {
-    checkAuthApi.execute();
-  }, []);
+  const checkAuthCallback = useCallback(() => checkAuthApi.execute(), [checkAuthApi.execute]);
 
   return {
     login: loginCallback,

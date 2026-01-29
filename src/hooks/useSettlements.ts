@@ -21,6 +21,7 @@ export function useSettlements() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { token } = useDataStore();
+  const authToken = token || localStorage.getItem("auth_token");
 
   const apiRequest = useCallback(async (endpoint: string, options: RequestInit = {}) => {
     const headers: Record<string, string> = {
@@ -28,8 +29,8 @@ export function useSettlements() {
       ...(options.headers as Record<string, string>),
     };
 
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
+    if (authToken) {
+      headers.Authorization = `Bearer ${authToken}`;
     }
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -43,7 +44,7 @@ export function useSettlements() {
     }
 
     return response.json();
-  }, [token]);
+  }, [authToken]);
 
   const fetchSettlements = useCallback(async (date: string) => {
     setLoading(true);

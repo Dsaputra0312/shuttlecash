@@ -33,6 +33,7 @@ import {
 } from "./ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Badge } from "./ui/badge";
+import { TableCard } from "./TableCard";
 import {
   Dialog,
   DialogContent,
@@ -255,8 +256,10 @@ export function IncomeExpense() {
         </TabsList>
 
         <TabsContent value="income" className="animate-in fade-in slide-in-from-left-4 duration-500 focus-visible:outline-none">
-          <Card className="shadow-xl border-none overflow-hidden bg-white/60 backdrop-blur-sm ring-1 ring-emerald-100">
-            <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50/50 border-b border-emerald-100 pb-6">
+          <TableCard
+            className="ring-emerald-100"
+            headerClassName="bg-gradient-to-r from-emerald-50 to-teal-50/50 border-b border-emerald-100 pb-6"
+            header={
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="relative w-full md:w-96 group">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-600 group-focus-within:text-emerald-700 transition-colors" />
@@ -324,75 +327,76 @@ export function IncomeExpense() {
                   </DialogContent>
                 </Dialog>
               </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader className="bg-muted/10">
+            }
+          >
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader className="bg-muted/10">
+                  <TableRow>
+                    <TableHead>Tanggal</TableHead>
+                    <TableHead>Keterangan</TableHead>
+                    <TableHead className="text-right">Jumlah</TableHead>
+                    <TableHead className="text-right">Aksi</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {loadingStates.incomeRecords ? (
+                    Array.from({ length: 5 }).map((_, index) => (
+                      <TableRow key={index}>
+                        <TableCell><div className="w-24 h-4 bg-muted rounded animate-pulse"></div></TableCell>
+                        <TableCell><div className="w-48 h-4 bg-muted rounded animate-pulse"></div></TableCell>
+                        <TableCell className="text-right"><div className="w-24 h-4 bg-muted rounded ml-auto animate-pulse"></div></TableCell>
+                        <TableCell className="text-right"><div className="w-8 h-8 bg-muted rounded ml-auto animate-pulse"></div></TableCell>
+                      </TableRow>
+                    ))
+                  ) : filteredIncome.length === 0 ? (
                     <TableRow>
-                      <TableHead>Tanggal</TableHead>
-                      <TableHead>Keterangan</TableHead>
-                      <TableHead className="text-right">Jumlah</TableHead>
-                      <TableHead className="text-right">Aksi</TableHead>
+                      <TableCell colSpan={4} className="text-center py-20 text-muted-foreground">
+                        <div className="flex flex-col items-center justify-center animate-in fade-in duration-500">
+                          <TrendingUp className="w-16 h-16 mb-4 opacity-10" />
+                          <p className="text-lg font-medium">Tidak ada data pemasukan</p>
+                        </div>
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {loadingStates.incomeRecords ? (
-                      Array.from({ length: 5 }).map((_, index) => (
-                        <TableRow key={index}>
-                          <TableCell><div className="w-24 h-4 bg-muted rounded animate-pulse"></div></TableCell>
-                          <TableCell><div className="w-48 h-4 bg-muted rounded animate-pulse"></div></TableCell>
-                          <TableCell className="text-right"><div className="w-24 h-4 bg-muted rounded ml-auto animate-pulse"></div></TableCell>
-                          <TableCell className="text-right"><div className="w-8 h-8 bg-muted rounded ml-auto animate-pulse"></div></TableCell>
-                        </TableRow>
-                      ))
-                    ) : filteredIncome.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={4} className="text-center py-20 text-muted-foreground">
-                          <div className="flex flex-col items-center justify-center animate-in fade-in duration-500">
-                            <TrendingUp className="w-16 h-16 mb-4 opacity-10" />
-                            <p className="text-lg font-medium">Tidak ada data pemasukan</p>
+                  ) : (
+                    filteredIncome.slice().reverse().map((record) => (
+                      <TableRow key={record.id} className="group hover:bg-muted/30 transition-colors">
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-2">
+                            <CalendarIcon className="w-4 h-4 text-muted-foreground" />
+                            {new Date(record.date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
                           </div>
                         </TableCell>
+                        <TableCell className="max-w-[400px]">
+                          <p className="font-medium group-hover:text-emerald-600 transition-colors">{record.description}</p>
+                        </TableCell>
+                        <TableCell className="text-right font-bold text-emerald-600">
+                          + Rp {record.amount.toLocaleString("id-ID")}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setRecordToDelete({ id: record.id, type: "income" })}
+                            className="text-muted-foreground hover:text-rose-600 hover:bg-rose-50 rounded-lg h-8 w-8"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </TableCell>
                       </TableRow>
-                    ) : (
-                      filteredIncome.slice().reverse().map((record) => (
-                        <TableRow key={record.id} className="group hover:bg-muted/30 transition-colors">
-                          <TableCell className="font-medium">
-                            <div className="flex items-center gap-2">
-                              <CalendarIcon className="w-4 h-4 text-muted-foreground" />
-                              {new Date(record.date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
-                            </div>
-                          </TableCell>
-                          <TableCell className="max-w-[400px]">
-                            <p className="font-medium group-hover:text-emerald-600 transition-colors">{record.description}</p>
-                          </TableCell>
-                          <TableCell className="text-right font-bold text-emerald-600">
-                            + Rp {record.amount.toLocaleString("id-ID")}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => setRecordToDelete({ id: record.id, type: "income" })}
-                              className="text-muted-foreground hover:text-rose-600 hover:bg-rose-50 rounded-lg h-8 w-8"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </TableCard>
         </TabsContent>
 
         <TabsContent value="expense" className="animate-in fade-in slide-in-from-right-4 duration-500 focus-visible:outline-none">
-          <Card className="shadow-xl border-none overflow-hidden bg-white/60 backdrop-blur-sm ring-1 ring-rose-100">
-            <CardHeader className="bg-gradient-to-r from-rose-50 to-orange-50/50 border-b border-rose-100 pb-6">
+          <TableCard
+            className="ring-rose-100"
+            headerClassName="bg-gradient-to-r from-rose-50 to-orange-50/50 border-b border-rose-100 pb-6"
+            header={
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="relative w-full md:w-96 group">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-rose-600 group-focus-within:text-rose-700 transition-colors" />
@@ -460,19 +464,19 @@ export function IncomeExpense() {
                   </DialogContent>
                 </Dialog>
               </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader className="bg-muted/10">
-                    <TableRow>
-                      <TableHead>Tanggal</TableHead>
-                      <TableHead>Keterangan</TableHead>
-                      <TableHead className="text-right">Jumlah</TableHead>
-                      <TableHead className="text-right">Aksi</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+            }
+          >
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader className="bg-muted/10">
+                  <TableRow>
+                    <TableHead>Tanggal</TableHead>
+                    <TableHead>Keterangan</TableHead>
+                    <TableHead className="text-right">Jumlah</TableHead>
+                    <TableHead className="text-right">Aksi</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                     {loadingStates.expenseRecords ? (
                       Array.from({ length: 5 }).map((_, index) => (
                         <TableRow key={index}>
@@ -519,11 +523,10 @@ export function IncomeExpense() {
                         </TableRow>
                       ))
                     )}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
+                </TableBody>
+              </Table>
+            </div>
+          </TableCard>
         </TabsContent>
       </Tabs>
 

@@ -224,7 +224,10 @@ export const useDataStore = create<DataStore>()(
 
       checkAuth: async () => {
         const token = localStorage.getItem("auth_token");
-        if (!token) return;
+        if (!token) {
+          set({ isAuthenticated: false, user: null, token: null });
+          return;
+        }
 
         try {
           const response = await fetch(`${API_BASE_URL}/auth/verify`, {
@@ -244,9 +247,11 @@ export const useDataStore = create<DataStore>()(
             // Other pages fetch their data as needed
           } else {
             localStorage.removeItem("auth_token");
+            set({ isAuthenticated: false, user: null, token: null });
           }
         } catch (error) {
           localStorage.removeItem("auth_token");
+          set({ isAuthenticated: false, user: null, token: null });
         }
       },
 
