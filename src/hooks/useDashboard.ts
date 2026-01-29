@@ -89,8 +89,11 @@ export function useDashboard() {
       setLoading(true);
       setError(null);
 
+      // Fetch dashboard data from dedicated endpoint
+      console.log("Fetching dashboard data...");
       const response = await apiRequest("/dashboard");
-      setDashboardData(response.data);
+      console.log("Dashboard data received:", response);
+      setDashboardData(response);
     } catch (err: any) {
       console.error("Dashboard fetch error:", err);
       setError(err.message || "Failed to fetch dashboard data");

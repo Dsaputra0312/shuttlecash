@@ -11,6 +11,7 @@ import { MembersPage } from "./pages/MembersPage";
 import { FinancePage } from "./pages/FinancePage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { SettingsPage } from "./pages/SettingsPage";
+import { PaymentPage } from "./pages/PaymentPage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useDataStore();
@@ -75,6 +76,16 @@ export default function App() {
             <ProtectedRoute>
               <MainLayout>
                 <FinancePage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/payments"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <PaymentPage />
               </MainLayout>
             </ProtectedRoute>
           }

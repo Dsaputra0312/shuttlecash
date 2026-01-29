@@ -20,6 +20,7 @@ export interface UsageRecord {
   quantity: number;
   has_non_member: boolean;
   total_cost: number;
+  match_number?: number;
   created_at: string;
 }
 
