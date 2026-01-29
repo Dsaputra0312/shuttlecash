@@ -4,7 +4,17 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3002/api";
 
 // API helper function
-const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
+type ApiResponse<T> = {
+  status: "success" | "error";
+  message?: string;
+  data?: T;
+  errors?: string[];
+};
+
+const apiRequest = async <T,>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> => {
   const token = localStorage.getItem("auth_token");
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -21,10 +31,10 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
   });
 
   if (!response.ok) {
-    const error = await response
+    const errorBody = await response
       .json()
-      .catch(() => ({ error: "Network error" }));
-    throw new Error(error.error || `HTTP ${response.status}`);
+      .catch(() => ({ message: "Network error" }));
+    throw new Error(errorBody.message || errorBody.error || `HTTP ${response.status}`);
   }
 
   return response.json();
@@ -89,13 +99,9 @@ export function useDashboard() {
       setLoading(true);
       setError(null);
 
-      // Fetch dashboard data from dedicated endpoint
-      console.log("Fetching dashboard data...");
-      const response = await apiRequest("/dashboard");
-      console.log("Dashboard data received:", response);
-      setDashboardData(response);
+      const response = await apiRequest<ApiResponse<DashboardData>>("/dashboard");
+      setDashboardData(response.data ?? null);
     } catch (err: any) {
-      console.error("Dashboard fetch error:", err);
       setError(err.message || "Failed to fetch dashboard data");
     } finally {
       setLoading(false);

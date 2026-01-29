@@ -5,6 +5,8 @@ import { Calendar as CalendarIcon, Check, Loader2 } from "lucide-react";
 import { cn } from "../components/ui/utils";
 import { Button } from "../components/ui/button";
 import { Calendar } from "../components/ui/calendar";
+import { CardDescription, CardTitle } from "../components/ui/card";
+import { TableCard } from "../components/TableCard";
 import {
   Popover,
   PopoverContent,
@@ -108,7 +110,7 @@ export function PaymentPage() {
               <Calendar
                 mode="single"
                 selected={date}
-                onSelect={(d) => d && setDate(d)}
+                onSelect={(d: Date | undefined) => d && setDate(d)}
                 initialFocus
               />
             </PopoverContent>
@@ -116,88 +118,124 @@ export function PaymentPage() {
         </div>
       </div>
 
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nama Pemain</TableHead>
-              <TableHead>Jumlah Kok</TableHead>
-              <TableHead>Status Member</TableHead>
-              <TableHead>Rincian Tagihan</TableHead>
-              <TableHead>Total Bayar</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Aksi</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
+      <TableCard
+        className="ring-blue-100"
+        headerClassName="bg-gradient-to-r from-blue-50 to-indigo-50/50 border-b border-blue-100 pb-6"
+        header={
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <CardTitle className="text-xl">Daftar Tagihan</CardTitle>
+              <CardDescription>Tagihan pemain untuk tanggal terpilih.</CardDescription>
+            </div>
+            <Badge
+              variant="outline"
+              className="px-3 py-1 rounded-full bg-white border-blue-200 text-blue-700 font-bold shadow-sm"
+            >
+              {settlements.length} Pemain
+            </Badge>
+          </div>
+        }
+      >
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader className="bg-muted/10">
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center">
-                  <div className="flex justify-center items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Memuat data...</span>
-                  </div>
-                </TableCell>
+                <TableHead>Nama Pemain</TableHead>
+                <TableHead className="text-right">Jumlah Kok</TableHead>
+                <TableHead>Status Member</TableHead>
+                <TableHead>Rincian Tagihan</TableHead>
+                <TableHead className="text-right">Total Bayar</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Aksi</TableHead>
               </TableRow>
-            ) : settlements.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center">
-                  Tidak ada data permainan untuk tanggal ini.
-                </TableCell>
-              </TableRow>
-            ) : (
-              settlements.map((settlement) => (
-                <TableRow key={settlement.memberId}>
-                  <TableCell className="font-medium">{settlement.name}</TableCell>
-                  <TableCell>{settlement.shuttlecockCount.toFixed(1)}</TableCell>
-                  <TableCell>
-                    {settlement.isMember ? (
-                      <Badge variant="secondary">Member</Badge>
-                    ) : (
-                      <Badge variant="outline">Non-Member</Badge>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    <div>Kok: {formatCurrency(settlement.shuttlecockCost)}</div>
-                    {!settlement.isMember && (
-                      <div>Lapangan: {formatCurrency(settlement.courtFee)}</div>
-                    )}
-                  </TableCell>
-                  <TableCell className="font-bold">
-                    {formatCurrency(settlement.totalBill)}
-                    {settlement.overpayment > 0 && (
-                      <div className="text-xs text-green-600 font-normal">
-                        +{formatCurrency(settlement.overpayment)} (Lebih)
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {settlement.status === 'paid' ? (
-                      <Badge className="bg-green-500 hover:bg-green-600">Lunas</Badge>
-                    ) : (
-                      <Badge variant="destructive">Belum Lunas</Badge>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      size="sm"
-                      onClick={() => handlePayClick(settlement)}
-                      disabled={settlement.status === 'paid'}
-                    >
-                      {settlement.status === 'paid' ? (
-                        <Check className="h-4 w-4 mr-1" />
-                      ) : (
-                        "Bayar"
-                      )}
-                      {settlement.status === 'paid' ? "Lunas" : "Lunas"}
-                    </Button>
+            </TableHeader>
+            <TableBody>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-24 text-center">
+                    <div className="flex justify-center items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Memuat data...</span>
+                    </div>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              ) : settlements.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                    Tidak ada data permainan untuk tanggal ini.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                settlements.map((settlement) => (
+                  <TableRow
+                    key={settlement.memberId}
+                    className="group hover:bg-muted/30 transition-colors"
+                  >
+                    <TableCell className="font-semibold group-hover:text-primary transition-colors">
+                      {settlement.name}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {settlement.shuttlecockCount.toFixed(1)}
+                    </TableCell>
+                    <TableCell>
+                      {settlement.isMember ? (
+                        <Badge className="rounded-full px-3 py-0.5 font-medium border-none shadow-sm bg-emerald-50 text-emerald-600">
+                          Member
+                        </Badge>
+                      ) : (
+                        <Badge className="rounded-full px-3 py-0.5 font-medium border-none shadow-sm bg-orange-50 text-orange-600">
+                          Non-Member
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      <div>Kok: {formatCurrency(settlement.shuttlecockCost)}</div>
+                      {!settlement.isMember && (
+                        <div>Lapangan: {formatCurrency(settlement.courtFee)}</div>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right font-black tabular-nums">
+                      <div>Rp {settlement.totalBill.toLocaleString("id-ID")}</div>
+                      {settlement.overpayment > 0 && (
+                        <div className="text-xs text-emerald-600 font-medium">
+                          +{formatCurrency(settlement.overpayment)} (Lebih)
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {settlement.status === "paid" ? (
+                        <Badge className="rounded-full px-3 py-0.5 font-bold border-none shadow-sm bg-emerald-50 text-emerald-600">
+                          Lunas
+                        </Badge>
+                      ) : (
+                        <Badge className="rounded-full px-3 py-0.5 font-bold border-none shadow-sm bg-rose-50 text-rose-600">
+                          Belum Lunas
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        size="sm"
+                        onClick={() => handlePayClick(settlement)}
+                        disabled={settlement.status === "paid"}
+                      >
+                        {settlement.status === "paid" ? (
+                          <>
+                            <Check className="h-4 w-4 mr-1" />
+                            Lunas
+                          </>
+                        ) : (
+                          "Bayar"
+                        )}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </TableCard>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>

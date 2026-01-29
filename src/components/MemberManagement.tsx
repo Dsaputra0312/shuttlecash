@@ -66,6 +66,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { TableCard } from "./TableCard";
 
 export function MemberManagement() {
   const {
@@ -342,131 +343,160 @@ export function MemberManagement() {
       </div>
 
       {/* Member Table */}
-      <Card className="shadow-xl border-none overflow-hidden bg-white/60 backdrop-blur-sm ring-1 ring-blue-100">
-        <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50/50 border-b border-blue-100 pb-6">
+      <TableCard
+        className="ring-blue-100"
+        headerClassName="bg-gradient-to-r from-blue-50 to-indigo-50/50 border-b border-blue-100 pb-6"
+        header={
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="relative w-full md:w-96 group">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-600 group-focus-within:text-blue-700 transition-colors" />
-              <Input 
-                placeholder="Cari nama pemain..." 
+              <Input
+                placeholder="Cari nama pemain..."
                 className="pl-10 rounded-xl bg-white border-blue-100 focus:border-blue-300 focus:ring-4 focus:ring-blue-100 transition-all shadow-sm"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="px-3 py-1 rounded-full bg-white border-blue-200 text-blue-700 font-bold shadow-sm">
+              <Badge
+                variant="outline"
+                className="px-3 py-1 rounded-full bg-white border-blue-200 text-blue-700 font-bold shadow-sm"
+              >
                 {filteredMembers.length} Terdaftar
               </Badge>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader className="bg-muted/10">
-                <TableRow>
-                  <TableHead className="w-[300px]">Pemain</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Grade</TableHead>
-                  <TableHead className="text-right">Aksi</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loadingStates.members ? (
-                  Array.from({ length: 5 }).map((_, index) => (
-                    <TableRow key={index}>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-muted rounded-full animate-pulse"></div>
-                          <div className="space-y-2">
-                            <div className="w-32 h-4 bg-muted rounded animate-pulse"></div>
-                            <div className="w-20 h-3 bg-muted rounded animate-pulse"></div>
-                          </div>
+        }
+      >
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader className="bg-muted/10">
+              <TableRow>
+                <TableHead className="w-[300px]">Pemain</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Grade</TableHead>
+                <TableHead className="text-right">Aksi</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {loadingStates.members ? (
+                Array.from({ length: 5 }).map((_, index) => (
+                  <TableRow key={index}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-muted rounded-full animate-pulse"></div>
+                        <div className="space-y-2">
+                          <div className="w-32 h-4 bg-muted rounded animate-pulse"></div>
+                          <div className="w-20 h-3 bg-muted rounded animate-pulse"></div>
                         </div>
-                      </TableCell>
-                      <TableCell><div className="w-20 h-6 bg-muted rounded-full animate-pulse"></div></TableCell>
-                      <TableCell><div className="w-16 h-6 bg-muted rounded-full animate-pulse"></div></TableCell>
-                      <TableCell className="text-right"><div className="w-8 h-8 bg-muted rounded ml-auto animate-pulse"></div></TableCell>
-                    </TableRow>
-                  ))
-                ) : filteredMembers.length === 0 ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={4}
-                      className="text-center py-20 text-muted-foreground">
-                      <div className="flex flex-col items-center justify-center animate-in fade-in duration-500">
-                        <Users className="w-16 h-16 mb-4 opacity-10" />
-                        <p className="text-lg font-medium">Pemain tidak ditemukan</p>
-                        <p className="text-sm">Coba kata kunci lain atau tambah pemain baru.</p>
                       </div>
                     </TableCell>
+                    <TableCell>
+                      <div className="w-20 h-6 bg-muted rounded-full animate-pulse"></div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="w-16 h-6 bg-muted rounded-full animate-pulse"></div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="w-8 h-8 bg-muted rounded ml-auto animate-pulse"></div>
+                    </TableCell>
                   </TableRow>
-                ) : (
-                  filteredMembers.map((member) => (
-                    <TableRow key={member.id} className="group hover:bg-muted/30 transition-colors">
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-10 w-10 border border-muted shadow-sm">
-                            <AvatarFallback className={member.is_member ? "bg-primary/10 text-primary font-bold" : "bg-muted text-muted-foreground font-bold"}>
-                              {member.name.charAt(0).toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex flex-col">
-                            <span className="font-semibold group-hover:text-primary transition-colors">{member.name}</span>
-                            <span className="text-[10px] text-muted-foreground uppercase tracking-tighter">ID: {member.id.substring(0, 8)}</span>
-                          </div>
+                ))
+              ) : filteredMembers.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center py-20 text-muted-foreground">
+                    <div className="flex flex-col items-center justify-center animate-in fade-in duration-500">
+                      <Users className="w-16 h-16 mb-4 opacity-10" />
+                      <p className="text-lg font-medium">Pemain tidak ditemukan</p>
+                      <p className="text-sm">Coba kata kunci lain atau tambah pemain baru.</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredMembers.map((member) => (
+                  <TableRow
+                    key={member.id}
+                    className="group hover:bg-muted/30 transition-colors"
+                  >
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-10 w-10 border border-muted shadow-sm">
+                          <AvatarFallback
+                            className={
+                              member.is_member
+                                ? "bg-primary/10 text-primary font-bold"
+                                : "bg-muted text-muted-foreground font-bold"
+                            }
+                          >
+                            {member.name.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col">
+                          <span className="font-semibold group-hover:text-primary transition-colors">
+                            {member.name}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground uppercase tracking-tighter">
+                            ID: {member.id.substring(0, 8)}
+                          </span>
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          className={`rounded-full px-3 py-0.5 font-medium border-none shadow-sm ${
-                            member.is_member
-                              ? "bg-emerald-50 text-emerald-600"
-                              : "bg-orange-50 text-orange-600"
-                          }`}>
-                          {member.is_member ? "Active Member" : "Guest Player"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary" className="gap-1 rounded-full px-3 py-0.5 font-medium bg-amber-50 text-amber-600 border-none shadow-sm">
-                          <Trophy className="w-3 h-3" />
-                          {member.grade}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-background">
-                              <MoreVertical className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="rounded-xl w-40">
-                            <DropdownMenuItem 
-                              onClick={() => handleEdit(member)}
-                              className="gap-2 cursor-pointer rounded-lg"
-                            >
-                              <Edit2 className="w-4 h-4 text-blue-500" />
-                              <span>Edit Profil</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => setMemberToDelete(member.id)}
-                              className="gap-2 cursor-pointer text-destructive focus:text-destructive rounded-lg"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                              <span>Hapus</span>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        className={`rounded-full px-3 py-0.5 font-medium border-none shadow-sm ${
+                          member.is_member
+                            ? "bg-emerald-50 text-emerald-600"
+                            : "bg-orange-50 text-orange-600"
+                        }`}
+                      >
+                        {member.is_member ? "Active Member" : "Guest Player"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="secondary"
+                        className="gap-1 rounded-full px-3 py-0.5 font-medium bg-amber-50 text-amber-600 border-none shadow-sm"
+                      >
+                        <Trophy className="w-3 h-3" />
+                        {member.grade}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-lg hover:bg-background"
+                          >
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="rounded-xl w-40">
+                          <DropdownMenuItem
+                            onClick={() => handleEdit(member)}
+                            className="gap-2 cursor-pointer rounded-lg"
+                          >
+                            <Edit2 className="w-4 h-4 text-blue-500" />
+                            <span>Edit Profil</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => setMemberToDelete(member.id)}
+                            className="gap-2 cursor-pointer text-destructive focus:text-destructive rounded-lg"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            <span>Hapus</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </TableCard>
 
       <AlertDialog open={!!memberToDelete} onOpenChange={(open: boolean) => !open && setMemberToDelete(null)}>
         <AlertDialogContent className="rounded-2xl">

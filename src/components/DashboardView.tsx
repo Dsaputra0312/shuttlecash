@@ -299,7 +299,7 @@ export function DashboardView({
                     }}
                   />
                   <Bar
-                    dataKey="quantity"
+                    dataKey="totalUsage"
                     fill="#f59e0b"
                     radius={[0, 4, 4, 0]}
                     barSize={24}
